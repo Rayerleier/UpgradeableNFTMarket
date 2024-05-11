@@ -2,5 +2,8 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+solc_version = "0.8.25"
+build_info = true  # 使用foundry upgrades library所需的配置
+extra_output = ["storageLayout"]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
