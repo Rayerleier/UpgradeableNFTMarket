@@ -12,6 +12,10 @@
 
 
 
+## 测试用例截图
+
+![image-20240513144452134](/home/rayer/.config/Typora/typora-user-images/image-20240513144452134.png)
+
 | Contract                    | Addree                                     |
 | --------------------------- | ------------------------------------------ |
 | NFTMarketV1                 | 0x38D85C8307D119f14E60e132D7C9274Ba79DCa09 |
@@ -119,3 +123,6 @@ Transaction hash: 0x1afc61ae0cb0e0303265d300e8de013d2a79ed1d49d1445bfaaebd6583ec
     }
 ```
 
+## 测试用例截图
+
+![image-20240513144507579](/home/rayer/.config/Typora/typora-user-images/image-20240513144507579.png)

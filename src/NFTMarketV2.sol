@@ -42,8 +42,8 @@ contract NFTMarketV2 is EIP712 {
             "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
         );
 
-    error InvalidSigner(address signer,address owner);
-    error ExpiredSignature(uint256 deadLine );
+    error InvalidSigner(address signer, address owner);
+    error ExpiredSignature(uint256 deadLine);
     constructor() EIP712("rain", "1") {}
 
     function _DOMAIN_SEPARATOR() external view returns (bytes32) {
