@@ -7,15 +7,13 @@ import "./BaseERC721.sol";
 import "../lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
 import "./interface/IDomain.sol";
 
-
-
 //Write a simple NFT market contract, using your own issued Token to buy and sell NFTs. The functions include:
 
 // list(): Implement the listing function, where the NFT holder can set a price
 // (how many tokens are needed to purchase the NFT) and list the NFT on the NFT market.
 // buyNFT(): Implement the purchase function for NFTs,
 // where users transfer the specified token quantity and receive the corresponding NFT.
-contract NFTMarketV2 is EIP712{
+contract NFTMarketV2 is EIP712 {
     struct listOfNFTs {
         uint256 price;
         address seller;
@@ -26,7 +24,12 @@ contract NFTMarketV2 is EIP712{
     // tokenId => ListOfNFTS
     mapping(address => mapping(uint256 => listOfNFTs)) public listings;
 
-    event Listed(address indexed nftca, uint256 indexed tokenId, address seller, uint256 price);
+    event Listed(
+        address indexed nftca,
+        uint256 indexed tokenId,
+        address seller,
+        uint256 price
+    );
     event Bought(
         uint256 indexed tokenId,
         address buyer,
@@ -34,17 +37,30 @@ contract NFTMarketV2 is EIP712{
         uint256 price
     );
 
-    constructor() EIP712("rain","1"){}
+    bytes32 private immutable _PERMIT_TYPEHASH =
+        keccak256(
+            "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+        );
 
-    function _DOMAIN_SEPARATOR() external view returns(bytes32) {
+    error InvalidSigner(address signer,address owner);
+    error ExpiredSignature(uint256 deadLine );
+    constructor() EIP712("rain", "1") {}
+
+    function _DOMAIN_SEPARATOR() external view returns (bytes32) {
         return _domainSeparatorV4();
     }
 
-    function pricceOfListings(address nftCA, uint256 tokenId) external view returns(uint256){
+    function pricceOfListings(
+        address nftCA,
+        uint256 tokenId
+    ) external view returns (uint256) {
         return listings[nftCA][tokenId].price;
     }
 
-    function ownerOfListings(address nftCA,uint256 tokenId) external view returns (address) {
+    function ownerOfListings(
+        address nftCA,
+        uint256 tokenId
+    ) external view returns (address) {
         return listings[nftCA][tokenId].seller;
     }
 
@@ -58,7 +74,7 @@ contract NFTMarketV2 is EIP712{
         listings[nftAddress][tokenId].seller = msg.sender;
         listings[nftAddress][tokenId].price = price;
         nftContract.safeTransferFrom(msg.sender, address(this), tokenId);
-        emit Listed(nftAddress,tokenId, msg.sender, price);
+        emit Listed(nftAddress, tokenId, msg.sender, price);
     }
 
     function buy(
@@ -215,13 +231,39 @@ contract NFTMarketV2 is EIP712{
     ) internal {
         // NFTContract = new NFTContract()
         nftContract = BaseERC721(contractAddress);
+        _permitVaild(owner, spender, tokenId, deadline, v, r, s);
+
         list(contractAddress, tokenId, price);
     }
-    
 
+    function _permitVaild(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public virtual {
+        if (block.timestamp > deadline) {
+            revert ExpiredSignature(deadline);
+        }
+        bytes32 structHash = keccak256(
+            abi.encode(_PERMIT_TYPEHASH, owner, spender, value, value, deadline)
+        );
+        bytes32 hash = _hashTypedDataV4(structHash);
+        address signer = ECDSA.recover(hash, v, r, s);
+        if (signer != owner) {
+            revert InvalidSigner(signer, owner);
+        }
+    }
 
-    function onERC721Received(address,address,uint256,bytes memory) external pure returns(bytes4){
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes memory
+    ) external pure returns (bytes4) {
         return this.onERC721Received.selector;
-        
     }
 }

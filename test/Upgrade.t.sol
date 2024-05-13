@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import {Test, console} from "forge-std/Test.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
-import {NFTMarketProxy} from "../src/NFTMarketProxy.sol";
+import {NFTMarketProxy} from "../src/MyNFTMarketProxy.sol";
 import {NFTMarketProxyAdmin} from "../src/NFTMarketProxyAdmin.sol";
 import {NFTMarketV1} from "../src/NFTMarketV1.sol";
 import {NFTMarketV2} from "../src/NFTMarketV2.sol";

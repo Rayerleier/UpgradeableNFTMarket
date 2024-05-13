@@ -19,71 +19,103 @@
 | TransparentUpgradeableProxy | 0xba6464F22959a9628920D27FdF1F1Acbb4Cd491E |
 | ProxyAdmin                  | 0x90dC6ee5d254d84154f7a4577fC4a27911a1af55 |
 
+```solidity
+NFTMarketV1
+Traces:
+  [487267] NFTMarketV1Script::run()
+    ├─ [0] VM::broadcast()
+    │   └─ ← [Return] 
+    ├─ [448886] → new NFTMarketV1@0x38D85C8307D119f14E60e132D7C9274Ba79DCa09
+    │   └─ ← [Return] 2242 bytes of code
+    ├─ [0] console::log(NFTMarketV1: [0x38D85C8307D119f14E60e132D7C9274Ba79DCa09]) [staticcall]
+    │   └─ ← [Stop] 
+    └─ ← [Stop] 
 
+Script ran successfully.
+Gas used: 508331
 
-## Foundry
+== Logs ==
+  0x38D85C8307D119f14E60e132D7C9274Ba79DCa09
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
-
-Foundry consists of:
-
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
-
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
+If you wish to simulate on-chain transactions pass a RPC URL.
 ```
 
-### Test
-
-```shell
-$ forge test
+```solidity
+NFTMarketV2
+Deployer: 0xceD0324969581Fe73b5c867d1aAC8E2e33d0946E
+Deployed to: 0xde6f974ab4f49683b24719F014B1A40693b1d35e
+Transaction hash: 0x1845c48b4c4c76d77d954fa8f5969ffc9e3bb5d835e302e80f4a5f6ac78f72a1
 ```
 
-### Format
-
-```shell
-$ forge fmt
+```solidity
+ProxyAdmin
+Deployer: 0xceD0324969581Fe73b5c867d1aAC8E2e33d0946E
+Deployed to: 0x90dC6ee5d254d84154f7a4577fC4a27911a1af55
+Transaction hash: 0x45881cb04fee5af13b64cf71200462b9a91cc1fd8476263a1252073f07f41eaa
 ```
 
-### Gas Snapshots
-
-```shell
-$ forge snapshot
+```solidity
+Trans
+Deployer: 0xceD0324969581Fe73b5c867d1aAC8E2e33d0946E
+Deployed to: 0xba6464F22959a9628920D27FdF1F1Acbb4Cd491E
+Transaction hash: 0xc037bb708184ddb5f7c7f0b13e69c0506e28efcc1235e6e870ca6d84135f0052
 ```
 
-### Anvil
+# first_revise
 
-```shell
-$ anvil
+- 批注
+
+升级合约构造函数不可用。
+白名单并不是 permit 授权，需要自己设计签名逻辑，并且应该在 NFTMarket 中进行验签。
+
+```solidity
+NFTMarketV2
+Deployer: 0xceD0324969581Fe73b5c867d1aAC8E2e33d0946E
+Deployed to: 0x1580139A867576C4c4db079cc14aF791C13BAE87
+Transaction hash: 0x1afc61ae0cb0e0303265d300e8de013d2a79ed1d49d1445bfaaebd6583ec698f
 ```
 
-### Deploy
+* 修改了permitList
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```solidity
+    function _permitList(
+        address owner,
+        address spender,
+        address contractAddress,
+        uint256 price,
+        uint256 tokenId,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) internal {
+        // NFTContract = new NFTContract()
+        nftContract = BaseERC721(contractAddress);
+        _permitVaild(owner, spender, tokenId, deadline, v, r, s);
+
+        list(contractAddress, tokenId, price);
+    }
+
+    function _permitVaild(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public virtual {
+        if (block.timestamp > deadline) {
+            revert ExpiredSignature(deadline);
+        }
+        bytes32 structHash = keccak256(
+            abi.encode(_PERMIT_TYPEHASH, owner, spender, value, value, deadline)
+        );
+        bytes32 hash = _hashTypedDataV4(structHash);
+        address signer = ECDSA.recover(hash, v, r, s);
+        if (signer != owner) {
+            revert InvalidSigner(signer, owner);
+        }
+    }
 ```
 
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
