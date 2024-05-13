@@ -79,6 +79,25 @@ Deployed to: 0x1580139A867576C4c4db079cc14aF791C13BAE87
 Transaction hash: 0x1afc61ae0cb0e0303265d300e8de013d2a79ed1d49d1445bfaaebd6583ec698f
 ```
 
+* 修改了NFTMarketProxyAdmin.sol中的构造函数
+
+```solidity
+ constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(
+        address _logic,
+        address initialOwner,
+        bytes memory _data
+    ) public initializer {
+        TransparentUpgradeableProxy(_logic, initialOwner, _data);
+    }
+
+```
+
+
+
 * 修改了permitList
 
 ```solidity
