@@ -14,7 +14,7 @@
 
 ## 测试用例截图
 
-![image-20240513144452134](/home/rayer/.config/Typora/typora-user-images/image-20240513144452134.png)
+![image-20240513144452134](/home/rayer/Documents/OpenspaceBootcamp/W4D1_UpgradeableContract/UpgradeableContract/README.assets/image-20240513144452134.png)
 
 | Contract                    | Addree                                     |
 | --------------------------- | ------------------------------------------ |
@@ -125,4 +125,4 @@ Transaction hash: 0x1afc61ae0cb0e0303265d300e8de013d2a79ed1d49d1445bfaaebd6583ec
 
 ## 测试用例截图
 
-![image-20240513144507579](/home/rayer/.config/Typora/typora-user-images/image-20240513144507579.png)
+![image-20240513144452134](/home/rayer/Documents/OpenspaceBootcamp/W4D1_UpgradeableContract/UpgradeableContract/README.assets/image-20240513144452134-17155828195011.png)
